@@ -72,8 +72,7 @@ Open `scanner.py` and edit the `RULES` dictionary. The five classes are full nam
 
 DataPulse trains a character n-gram TF-IDF + Logistic Regression model from the bundled labelled field-name examples. Each CSV upload triggers prediction on column names only. Existing rule matches can add trusted synthetic labels; model-generated pseudo-labels are accepted only at confidence >= 0.90. The model retrains after at least three new accepted labels. Predictions below 0.65 confidence are left unclassified by ML. The training model and pseudo-label pool are stored locally in `models/` and `data/auto_labelled_fields.csv`.
 
-This is an experimental self-training loop: pseudo-labels can be wrong and can reinforce mistakes. The model does not inspect CSV row values, and automatic retraining does not mean the predictions are ground truth. Keep backups of the labelled dataset and inspect model outputs during development. The 43-field evaluation report remains separate from the expanded ML training seed set so training examples are not silently counted as evaluation results.
-=======
+
 # AIORI-3-HACKATHON-PROJECTS
 This repository will contain the code and resources for the AIORI-3 hackathon that will be developed during the AIORI-3
 
@@ -115,10 +114,11 @@ It aims to identify personal-data fields using configurable detection rules, mai
 - CSV Processing
 - Configurable Detection Rules
 - Automated Testing
+- -ML Models
 
 ## Project Status
 
-**Current Status:** Prototype development and testing.
+**Current Status:** Prototype development and testing done
 
 The project includes a Python-based scanner for CSV files and SQLite databases, configurable detection rules, metadata checks, and evaluation using manually labelled test data.
 
