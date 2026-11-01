@@ -1,0 +1,22 @@
+{
+  "full_name": {
+    "purpose": "Customer account support",
+    "retention": "24 months after account closure"
+  },
+  "email": {
+    "purpose": "Account notifications",
+    "retention": "24 months after account closure"
+  },
+  "phone": {
+    "purpose": "Optional account recovery",
+    "retention": ""
+  },
+  "address": {
+    "purpose": "",
+    "retention": ""
+  },
+  "passport_number": {
+    "purpose": "Identity verification in this synthetic example",
+    "retention": "12 months"
+  }
+}

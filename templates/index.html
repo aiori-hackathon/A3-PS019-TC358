@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DataPulse | Privacy Evidence Inventory</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-mark">DP</span>
+      <div>
+        <b>DataPulse</b>
+        <small>PRIVACY INTELLIGENCE</small>
+      </div>
+    </div>
+    <div class="nav-label">WORKSPACE</div>
+    <a class="nav active" href="/">▦ &nbsp; Overview</a>
+    <a class="nav" href="#inventory">◫ &nbsp; Field inventory</a>
+    <a class="nav" href="#gaps">⚑ &nbsp; Metadata gaps</a>
+    <a class="nav" href="#evaluation">◷ &nbsp; Detection evaluation</a>
+    <a class="nav" href="#ml-status">✦ &nbsp; ML learning</a>
+    <a class="nav" href="#exports">⇩ &nbsp; Evidence exports</a>
+    <div class="sidebar-bottom"><span class="status-dot"></span> Local demo environment<br><small>No external data sent</small></div>
+  </aside>
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <span class="eyebrow">CYBER SECURITY / PS-019</span>
+        <h1>Personal Data Discovery</h1>
+        <p>Discover candidate personal-data fields and review purpose & retention evidence.</p>
+      </div>
+      <div class="top-tag">● SYSTEM READY</div>
+    </header>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}{% for category, message in messages %}
+      <div class="flash {{ category }}">
+        {{ message }}
+      </div>{% endfor %}{% endif %}
+    {% endwith %}
+    <section class="hero">
+      <div>
+        <span class="eyebrow light">PRIVACY EVIDENCE INVENTORY</span>
+        <h2>Know what data you hold.<br><em>Document why you hold it.</em></h2><p>Hybrid rule-based + ML field discovery for synthetic CSV and SQLite datasets. Every finding is a candidate for human review, not a compliance verdict.</p>
+        <form action="{{ url_for('scan_demo') }}" method="post" class="scan-form">
+          <select name="source" aria-label="Data source"><option value="both">CSV + SQLite</option><option value="csv">CSV only</option><option value="sqlite">SQLite only</option></select>
+          <button type="submit">▶ Run demo scan</button>
+        </form>
+      </div>
+      <div class="hero-graphic"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="shield">✓</div><div class="node node-a">CSV</div><div class="node node-b">SQL</div><div class="node node-c">PII</div></div>
+    </section>
+    <section class="metrics">
+      <article class="metric"><div class="metric-label">CANDIDATE FIELDS</div><div class="metric-value">{{ metrics.get('candidate_fields', 0) }}</div><div class="metric-note">Rule + ML candidates</div></article>
+      <article class="metric"><div class="metric-label">METADATA GAPS</div><div class="metric-value warning">{{ metrics.get('metadata_gaps', 0) }}</div><div class="metric-note">Missing purpose or retention</div></article>
+      <article class="metric"><div class="metric-label">DATA CLASSES</div><div class="metric-value">{{ metrics.get('classes_found', [])|length }}</div><div class="metric-note">Of 5 configured classes</div></article>
+      <article class="metric"><div class="metric-label">REVIEW STATUS</div><div class="metric-value review">Human</div><div class="metric-note">Required before action</div></article>
+    </section>
+    <section class="panel" id="ml-status">
+      <div class="section-head"><div><span class="eyebrow">AUTOMATIC LEARNING</span><h2>Machine-learning engine</h2><p>TF-IDF + Logistic Regression learns from column names, not personal row values.</p></div><span class="pill good">{% if ml_status.model_ready %}MODEL READY{% else %}INITIALIZING{% endif %}</span></div>
+      <div class="metrics evaluation-metrics">
+        <article class="metric"><div class="metric-label">MODEL</div><div class="metric-value" style="font-size:18px">TF-IDF + LR</div><div class="metric-note">Text classification</div></article>
+        <article class="metric"><div class="metric-label">TRAINING EXAMPLES</div><div class="metric-value">{{ ml_status.training_examples }}</div><div class="metric-note">Base + automatic labels</div></article>
+        <article class="metric"><div class="metric-label">AUTO-LABELLED</div><div class="metric-value">{{ ml_status.auto_labelled_examples }}</div><div class="metric-note">High-confidence only</div></article>
+        <article class="metric"><div class="metric-label">LEARNING THRESHOLD</div><div class="metric-value">{{ (ml_status.auto_learning_threshold * 100)|int }}%</div><div class="metric-note">Minimum confidence for learning</div></article>
+      </div>
+      <p class="metric-note">Each CSV upload triggers prediction. The system adds only predictions at or above the learning threshold to its local pseudo-label pool and retrains after at least three new examples. Automatic labels can be wrong; this is an experimental self-training loop, not ground truth.</p>
+      <a href="{{ url_for('export', kind='ml_status') }}">⇩ Download ML model status</a>
+    </section>
+    <section class="panel" id="evaluation">
+      <div class="section-head"><div><span class="eyebrow">TEST EVIDENCE</span><h2>Detection evaluation</h2><p>Results on the included manually labelled synthetic field-name set; not a real-world guarantee.</p></div><span class="count">{{ evaluation.get('test_set_size', 0) }} labelled fields</span></div>
+      <div class="metrics evaluation-metrics">
+        <article class="metric"><div class="metric-label">PRECISION</div><div class="metric-value">{{ evaluation.get('precision', '—') }}</div><div class="metric-note">Correct candidates / all candidates</div></article>
+        <article class="metric"><div class="metric-label">RECALL</div><div class="metric-value">{{ evaluation.get('recall', '—') }}</div><div class="metric-note">Found / all labelled personal fields</div></article>
+        <article class="metric"><div class="metric-label">FALSE POSITIVES</div><div class="metric-value warning">{{ evaluation.get('false_positives', '—') }}</div><div class="metric-note">Non-personal fields flagged</div></article>
+        <article class="metric"><div class="metric-label">MISSED FIELDS</div><div class="metric-value warning">{{ evaluation.get('false_negatives', '—') }}</div><div class="metric-note">Labelled personal fields not found</div></article>
+      </div>
+      <div class="table-wrap"><table><thead><tr><th>DATA CLASS</th><th>PRECISION</th><th>RECALL</th><th>TRUE POSITIVE</th><th>FALSE POSITIVE</th><th>FALSE NEGATIVE</th></tr></thead><tbody>
+      {% for name, result in evaluation.get('per_class', {}).items() %}<tr><td><span class="class-pill">{{ name }}</span></td><td>{{ result.precision }}</td><td>{{ result.recall }}</td><td>{{ result.true_positives }}</td><td>{{ result.false_positives }}</td><td>{{ result.false_negatives }}</td></tr>{% else %}<tr><td colspan="6" class="empty">Run a scan to generate evaluation evidence.</td></tr>{% endfor %}
+      </tbody></table></div>
+      <p class="metric-note">False-positive examples: {{ evaluation.get('false_positive_examples', [])|join(', ') or 'None' }}. Missed examples: {{ evaluation.get('missed_detection_examples', [])|join(', ') or 'None' }}.</p>
+    </section>
+    <section class="panel" id="inventory">
+      <div class="section-head"><div><span class="eyebrow">DISCOVERY RESULTS</span><h2>Field inventory</h2><p>Detected columns and the metadata currently documented for each class.</p></div><span class="count">{{ inventory|length }} findings</span></div>
+      <div class="table-wrap"><table><thead><tr><th>SOURCE / TABLE</th><th>FIELD</th><th>DATA CLASS</th><th>PURPOSE</th><th>RETENTION</th><th>DETECTION</th><th>CONFIDENCE</th><th>STATUS</th></tr></thead><tbody>
+      {% for row in inventory %}<tr><td><b>{{ row.source }}</b><small>{{ row.table }}</small></td><td><code>{{ row.field }}</code></td><td><span class="class-pill">{{ row.data_class }}</span></td><td>{{ row.purpose or '—' }}</td><td>{{ row.retention or '—' }}</td><td>{{ row.rule }}</td><td>{% if row.get('confidence') is not none and row.get('confidence') != '' %}{{ ((row.get('confidence')|float) * 100)|round(1) }}%{% else %}<span class="muted">N/A</span>{% endif %}</td><td>{% if row.metadata_gap %}<span class="pill danger">Needs review</span>{% else %}<span class="pill good">Documented</span>{% endif %}</td></tr>{% else %}<tr><td colspan="8" class="empty">No scan results yet. Run the demo scan to populate this inventory.</td></tr>{% endfor %}
+      </tbody></table></div>
+    </section>
+    <section class="panel" id="gaps">
+      <div class="section-head"><div><span class="eyebrow">EVIDENCE QUALITY</span><h2>Metadata gaps</h2><p>Fields where purpose and/or retention metadata is missing.</p></div><span class="count danger-count">{{ gaps|length }} to review</span></div>
+      <div class="gap-grid">{% for row in gaps %}<article class="gap-card"><div class="gap-icon">!</div><div><b>{{ row.field }}</b><p>{{ row.source }} · {{ row.data_class }}</p><small>Missing: {{ row.metadata_gap }}</small></div></article>{% else %}<div class="empty wide">No metadata gaps in the latest scan, or no scan has been run.</div>{% endfor %}</div>
+    </section>
+    <section class="panel lower-grid" id="exports">
+      <div><span class="eyebrow">AUDIT ARTIFACTS</span><h2>Export evidence</h2><p>Download generated scan outputs for your report or review.</p>
+        <div class="export-list"><a href="{{ url_for('export', kind='inventory') }}">⇩ <span><b>Field inventory</b><small>inventory.csv</small></span></a><a href="{{ url_for('export', kind='gaps') }}">⇩ <span><b>Metadata gaps</b><small>metadata_gaps.csv</small></span></a><a href="{{ url_for('export', kind='metrics') }}">⇩ <span><b>Scan metrics</b><small>metrics.json</small></span></a><a href="{{ url_for('export', kind='evaluation') }}">⇩ <span><b>Evaluation evidence</b><small>evaluation_metrics.json</small></span></a></div>
+      </div>
+      <div class="upload-box"><span class="eyebrow">OPTIONAL INPUT</span><h3>Scan your own CSV</h3><p>Use a synthetic or authorised dataset. The demo scans column names, not row values.</p><form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data"><input type="file" name="dataset" accept=".csv" required><button type="submit" class="secondary">Scan CSV file</button></form><small>Only CSV files are accepted by this demo UI.</small></div>
+    </section>
+    <footer>DataPulse · AIORI Hackathon 3 · PS-019 · Educational prototype — human review required.</footer>
+  </main>
+</body>
+</html>
