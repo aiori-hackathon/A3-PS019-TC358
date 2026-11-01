@@ -25,43 +25,6 @@ DataPulse is a beginner-friendly educational prototype that:
 - pip
 - A browser
 
-## Run on Windows
-
-1. Extract the ZIP.
-2. Open PowerShell in the `PS019_DataPulse_Advanced` folder.
-3. Create a virtual environment:
-
-   ```powershell
-   py -m venv .venv
-   .\.venv\Scripts\Activate.ps1
-   ```
-
-4. Install dependencies:
-
-   ```powershell
-   python -m pip install -r requirements.txt
-   ```
-
-5. Run the dashboard:
-
-   ```powershell
-   python app.py
-   ```
-
-6. Open `http://127.0.0.1:5000`.
-7. Click **Run demo scan**. The dashboard will show the findings and metadata gaps.
-8. Download the CSV/JSON evidence from the Export evidence section.
-
-If PowerShell blocks activation, use `.\.venv\Scripts\python.exe -m pip install -r requirements.txt` and then `.\.venv\Scripts\python.exe app.py`.
-
-## Run tests
-
-From the project folder:
-
-```powershell
-python -m unittest discover -s tests -v
-```
-
 ## Project structure
 
 ```text
