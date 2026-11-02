@@ -2,8 +2,8 @@
 # DataPulse — AIORI Hackathon 3 | PS-019
 
 **Problem statement:** Personal-Data Discovery and Privacy Evidence Inventory  
-**Team:** Forge · **Team code:** A3-PS019-TC304  
-**Institution:** Muthoot Institute of Technology and Science  
+**Team:** CyberVault · **Team code:** A3-PS019-TC358 
+**Institution:** Ratan tata Maharashtra Sate Skill University 
 **Mentor:** Sheena Kurian K
 
 ## What it does
